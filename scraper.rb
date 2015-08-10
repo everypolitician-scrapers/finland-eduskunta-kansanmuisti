@@ -42,7 +42,7 @@ ScraperWiki.save_sqlite([:id], terms, 'terms')
 parties = json_from('party')
 json_from('member').each do |member|
   data = { 
-    id: member[:id],
+    id: member[:origin_id],
     name: member[:print_name],
     sort_name: member[:name],
     family_name: member[:surname],
@@ -55,6 +55,8 @@ json_from('member').each do |member|
     gender: gender_from(member[:gender]),
     homepage: member[:homepage_link],
     wikipedia: member[:wikipedia_link],
+    identifier__kansanmuisti: member[:id],
+    identifier__eduskunta: member[:origin_id],
     source: member[:info_link],
   }
   data[:photo] = URI.join('http://kansanmuisti.fi', data[:photo]).to_s unless data[:photo].to_s.empty?
