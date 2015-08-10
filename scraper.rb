@@ -63,15 +63,11 @@ json_from('member').each do |member|
   }
   data[:photo] = URI.join('http://kansanmuisti.fi', data[:photo]).to_s unless data[:photo].to_s.empty?
 
-  member[:terms].each do |term_name|
-    term = terms.find { |t| t[:identifier__km] == term_name.strip } or raise "No such term: #{term_name}"
-    term_start = term[:start_date] 
-    term_end   = term[:end_date]
-    member[:party_associations].each do |pa|
-      party_start = pa[:begin] 
-      party_end   = pa[:end] || '2015-03-14'
-      next unless party_start < term_end && party_end > term_start
-      overlap = [party_start, party_end, term_start, term_end].sort[1,2]
+  member[:party_associations].each do |pa|
+    party_start = pa[:begin] 
+    party_end   = pa[:end] || '2015-03-14'
+    terms.find_all { |term| party_start < term[:end_date] && party_end > term[:start_date] }.each do |term|
+      overlap = [party_start, party_end, term[:start_date], term[:end_date]].sort[1,2]
       membership = { 
         term: term[:id],
         start_date: overlap.first,
@@ -80,7 +76,10 @@ json_from('member').each do |member|
         party: parties.find(->{ { name: pa[:party] }}) { |p| p[:abbreviation] == pa[:party] }[:name],
       }
       row = data.merge(membership)
+      puts row
       ScraperWiki.save_sqlite([:id, :term, :start_date], row)
     end
+
   end
+
 end
