@@ -31,9 +31,11 @@ end
 
 terms = json_from('term').sort_by { |t| t[:begin] }.each_with_index do |t, i|
   t[:id] = i+1
-  t[:name] = t.delete(:display_name).strip
+  t[:name] = "Eduskunta #{i+1}"
+  t[:identifier__km] = t.delete(:display_name).strip
   t[:start_date] = t.delete :begin
   t[:end_date] = t.delete :end
+  t[:end_date] = '2015-03-14' if t[:identifier__km] == '2011'
   t.delete :resource_uri
   t.delete :visible
 end
@@ -62,9 +64,9 @@ json_from('member').each do |member|
   data[:photo] = URI.join('http://kansanmuisti.fi', data[:photo]).to_s unless data[:photo].to_s.empty?
 
   member[:terms].each do |term_name|
-    term = terms.find { |t| t[:name] == term_name.strip } or raise "No such term: #{term_name}"
+    term = terms.find { |t| t[:identifier__km] == term_name.strip } or raise "No such term: #{term_name}"
     term_start = term[:start_date] 
-    term_end   = term[:end_date] || '2015-03-14'
+    term_end   = term[:end_date]
     member[:party_associations].each do |pa|
       party_start = pa[:begin] 
       party_end   = pa[:end] || '2015-03-14'
