@@ -76,7 +76,6 @@ json_from('member').each do |member|
         party: parties.find(->{ { name: pa[:party] }}) { |p| p[:abbreviation] == pa[:party] }[:name],
       }
       row = data.merge(membership)
-      puts row
       ScraperWiki.save_sqlite([:id, :term, :start_date], row)
     end
 
