@@ -13,7 +13,7 @@ OpenURI::Cache.cache_path = '.cache'
 
 def json_from(url)
   url = "/api/v1/#{url}/?limit=200" unless url.include?("/")
-  url = URI.join('http://kansanmuisti.fi', url) unless url.start_with? 'http'
+  url = URI.join('https://kansanmuisti.fi', url) unless url.start_with? 'http'
   doc = JSON.parse(open(url).read, symbolize_names: true)
   if doc[:meta][:next]
     return doc[:objects] + json_from(doc[:meta][:next])
@@ -61,7 +61,7 @@ json_from('member').each do |member|
     identifier__eduskunta: member[:origin_id],
     source: member[:info_link],
   }
-  data[:photo] = URI.join('http://kansanmuisti.fi', data[:photo]).to_s unless data[:photo].to_s.empty?
+  data[:photo] = URI.join('https://kansanmuisti.fi', data[:photo]).to_s unless data[:photo].to_s.empty?
 
   member[:party_associations].each do |pa|
     party_start = pa[:begin] 
